@@ -3,6 +3,7 @@ const session = require('express-session');
 const morgan = require('morgan');
 const passport = require('passport');
 const bodyParser = require('body-parser');
+const db = require('./config/db');
 const app = express();
 
 // Parse incoming request bodies as JSON
@@ -38,6 +39,21 @@ app.use((err, req, res, next) => {
   console.log(err.stack);
   return res.status(500).json({error: "Something broke"})
 });
+
+// Create admin user if it doesn't exist
+(async () => {
+  try {
+    const {rows} = await db.query(
+      "INSERT INTO users (username, password) VALUES ($1, $2) ON CONFLICT (username) DO NOTHING",
+      [process.env.ADMIN_USERNAME || "admin", process.env.ADMIN_PASSWORD || "passsword"]
+    );
+    if (rows.length > 0) {
+      console.log("Created admin user")
+    }
+  } catch (e) {
+    console.log(e)
+  }
+})();
 
 // Start listening
 const port = process.env.PORT || 3000;
