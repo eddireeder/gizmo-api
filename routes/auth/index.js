@@ -4,7 +4,7 @@ const router = express.Router();
 const isAuthenticated = require('../../middlewares/isAuthenticated');
 
 // Use routes
-router.use('/register', require('./register'));
+router.use('/register', isAuthenticated, require('./register'));
 router.use('/login', require('./login'));
 router.use('/profile', isAuthenticated, require('./profile'));
 
