@@ -2,6 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const morgan = require('morgan');
 const passport = require('passport');
+const bcrypt = require('bcrypt')
 const bodyParser = require('body-parser');
 const db = require('./config/db');
 const app = express();
@@ -43,13 +44,11 @@ app.use((err, req, res, next) => {
 // Create admin user if it doesn't exist
 (async () => {
   try {
+    const hash = await bcrypt.hash(process.env.ADMIN_PASSWORD || "password", 10);
     const {rows} = await db.query(
       "INSERT INTO users (username, password) VALUES ($1, $2) ON CONFLICT (username) DO NOTHING",
-      [process.env.ADMIN_USERNAME || "admin", process.env.ADMIN_PASSWORD || "passsword"]
+      [process.env.ADMIN_USERNAME || "admin", hash]
     );
-    if (rows.length > 0) {
-      console.log("Created admin user")
-    }
   } catch (e) {
     console.log(e)
   }
