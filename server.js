@@ -3,6 +3,7 @@ const session = require('express-session');
 const morgan = require('morgan');
 const passport = require('passport');
 const bcrypt = require('bcrypt')
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const db = require('./config/db');
 const app = express();
@@ -26,6 +27,9 @@ app.use(passport.session());
 
 // Set up passport config to define strategies
 require('./config/passport');
+
+// Enable CORS within the app
+app.use(cors());
 
 // Use defined routes
 app.use('/', require('./routes'));
