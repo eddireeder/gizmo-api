@@ -19,7 +19,7 @@ router.get("/", async (req, res, next) => {
           category: sound.category,
           cdNumber: sound.cd_number,
           cdName: sound.cd_name,
-          trackNum: sound.track_num
+          trackNumber: sound.track_number
         };
       })
     });
@@ -40,7 +40,7 @@ router.post("/", isAuthenticated, async (req, res, next) => {
       req.body.hasOwnProperty("category") &&
       req.body.hasOwnProperty("cdNumber") &&
       req.body.hasOwnProperty("cdName") &&
-      req.body.hasOwnProperty("trackNum")
+      req.body.hasOwnProperty("trackNumber")
     )
   ) {
     return res.status(400).json({ message: "Invalid parameters" });
@@ -50,7 +50,7 @@ router.post("/", isAuthenticated, async (req, res, next) => {
     const { rows } = await db.query(
       `
       INSERT INTO sounds
-      (direction_x, direction_y, direction_z, location, description, category, cd_number, cd_name, track_num)
+      (direction_x, direction_y, direction_z, location, description, category, cd_number, cd_name, track_number)
       VALUES
       ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `,
@@ -63,7 +63,7 @@ router.post("/", isAuthenticated, async (req, res, next) => {
         req.body.category,
         req.body.cdNumber,
         req.body.cdName,
-        req.body.trackNum
+        req.body.trackNumber
       ]
     );
     return res.sendStatus(200);
