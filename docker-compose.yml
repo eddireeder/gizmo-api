@@ -1,7 +1,6 @@
-version: '3'
+version: "3"
 
 services:
-
   gizmo-postgres:
     image: postgres
     container_name: gizmo-postgres
