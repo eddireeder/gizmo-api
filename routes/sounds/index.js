@@ -3,6 +3,7 @@ const router = express.Router();
 
 const db = require("../../config/db");
 const isAuthenticated = require("../../middlewares/isAuthenticated");
+const generateDirection = require("./utils/generateDirection");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -32,9 +33,6 @@ router.post("/", isAuthenticated, async (req, res, next) => {
   // Verify input
   if (
     !(
-      req.body.hasOwnProperty("directionX") &&
-      req.body.hasOwnProperty("directionY") &&
-      req.body.hasOwnProperty("directionZ") &&
       req.body.hasOwnProperty("location") &&
       req.body.hasOwnProperty("description") &&
       req.body.hasOwnProperty("category") &&
@@ -45,8 +43,11 @@ router.post("/", isAuthenticated, async (req, res, next) => {
   ) {
     return res.status(400).json({ message: "Invalid parameters" });
   }
-  // Attempt insert
   try {
+    // Generate direction for the sound
+    const direction = await generateDirection();
+    console.log(direction);
+    // Attempt to insert
     const { rows } = await db.query(
       `
       INSERT INTO sounds
@@ -55,9 +56,9 @@ router.post("/", isAuthenticated, async (req, res, next) => {
       ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `,
       [
-        req.body.directionX,
-        req.body.directionY,
-        req.body.directionZ,
+        direction.x,
+        direction.y,
+        direction.z,
         req.body.location,
         req.body.description,
         req.body.category,
@@ -66,6 +67,22 @@ router.post("/", isAuthenticated, async (req, res, next) => {
         req.body.trackNumber
       ]
     );
+    return res.sendStatus(200);
+  } catch (e) {
+    return next(e);
+  }
+});
+
+router.delete("/:id", isAuthenticated, async (req, res, next) => {
+  // Verify input
+  if (!req.params.id) {
+    return res.status(400).json({ message: "Invalid parameters" });
+  }
+  // Attempt to delete
+  try {
+    const { rows } = await db.query("DELETE FROM sounds WHERE id=$1", [
+      req.params.id
+    ]);
     return res.sendStatus(200);
   } catch (e) {
     return next(e);
