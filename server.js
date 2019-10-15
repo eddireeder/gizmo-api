@@ -33,7 +33,12 @@ app.use(passport.session());
 require("./config/passport");
 
 // Enable CORS within the app
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3001",
+    credentials: true
+  })
+);
 
 // Use defined routes
 app.use("/", require("./routes"));
