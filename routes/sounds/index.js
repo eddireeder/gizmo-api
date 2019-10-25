@@ -33,12 +33,12 @@ router.post("/", isAuthenticated, async (req, res, next) => {
   // Verify input
   if (
     !(
-      req.body.hasOwnProperty("location") &&
-      req.body.hasOwnProperty("description") &&
-      req.body.hasOwnProperty("category") &&
-      req.body.hasOwnProperty("cdNumber") &&
-      req.body.hasOwnProperty("cdName") &&
-      req.body.hasOwnProperty("trackNumber")
+      req.body.location != null &&
+      req.body.description != null &&
+      req.body.category != null &&
+      req.body.cdNumber != null &&
+      req.body.cdName != null &&
+      req.body.trackNumber != null
     )
   ) {
     return res.status(400).json({ message: "Invalid parameters" });

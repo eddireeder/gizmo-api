@@ -10,13 +10,13 @@ router.post("/", async (req, res, next) => {
   let password = req.body.password;
 
   // Validate parameters
-  if (!username) {
+  if (username == null) {
     return res.status(400).json({ message: "Username is required" });
   } else if (username.indexOf(" ") !== -1) {
     return res
       .status(400)
       .json({ message: "Username must not contain any spaces" });
-  } else if (!password) {
+  } else if (password == null) {
     return res.status(400).json({ message: "Password is required" });
   } else if (password.length < 8) {
     return res

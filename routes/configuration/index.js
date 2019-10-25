@@ -26,9 +26,9 @@ router.post("/", isAuthenticated, async (req, res, next) => {
   // Verify input
   if (
     !(
-      req.body.hasOwnProperty("primaryAngle") &&
-      req.body.hasOwnProperty("secondaryAngle") &&
-      req.body.hasOwnProperty("timeToFocus")
+      req.body.primaryAngle != null &&
+      req.body.secondaryAngle != null &&
+      req.body.timeToFocus != null
     )
   ) {
     return res.status(400).json({ message: "Invalid parameters" });
