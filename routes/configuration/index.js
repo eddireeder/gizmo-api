@@ -8,14 +8,14 @@ router.get("/", async (req, res, next) => {
   try {
     const { rows } = await db.query("SELECT * FROM configurations");
     return res.json({
-      configurations: rows.map(configuration => {
-        return {
-          id: configuration.id,
-          primaryAngle: configuration.primary_angle,
-          secondaryAngle: configuration.secondary_angle,
-          timeToFocus: configuration.time_to_focus
-        };
-      })
+      configuration:
+        rows.length > 0
+          ? {
+              primaryAngle: rows[0].primary_angle,
+              secondaryAngle: rows[0].secondary_angle,
+              timeToFocus: rows[0].time_to_focus
+            }
+          : null
     });
   } catch (e) {
     return next(e);
@@ -34,8 +34,9 @@ router.post("/", isAuthenticated, async (req, res, next) => {
     return res.status(400).json({ message: "Invalid parameters" });
   }
   try {
-    // Attempt to insert
-    const { rows } = await db.query(
+    // Attempt to delete all then insert
+    await db.query("DELETE FROM configurations");
+    await db.query(
       `
       INSERT INTO configurations
       (primary_angle, secondary_angle, time_to_focus)

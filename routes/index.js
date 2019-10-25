@@ -4,6 +4,6 @@ const router = express.Router();
 // Use routes
 router.use("/auth", require("./auth"));
 router.use("/sounds", require("./sounds"));
-router.use("/configurations", require("./configurations"));
+router.use("/configuration", require("./configuration"));
 
 module.exports = router;
