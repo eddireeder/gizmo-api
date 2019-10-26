@@ -46,7 +46,6 @@ router.post("/", isAuthenticated, async (req, res, next) => {
   try {
     // Generate direction for the sound
     const direction = await generateDirection();
-    console.log(direction);
     // Attempt to insert
     const { rows } = await db.query(
       `
@@ -88,5 +87,36 @@ router.delete("/:id", isAuthenticated, async (req, res, next) => {
     return next(e);
   }
 });
+
+router.post(
+  "/regenerateDirections",
+  isAuthenticated,
+  async (req, res, next) => {
+    try {
+      // Remove direction from all sounds
+      await db.query(`
+        UPDATE sounds
+        SET (direction_x, direction_y, direction_z) = (null, null, null)
+      `);
+      // Retrieve all sounds
+      const { rows } = await db.query("SELECT * FROM sounds");
+      // Generate a new direction for each sound and update it
+      for (row of rows) {
+        const direction = await generateDirection();
+        await db.query(
+          `
+          UPDATE sounds
+          SET (direction_x, direction_y, direction_z) = ($1, $2, $3)
+          WHERE id=$4
+        `,
+          [direction.x, direction.y, direction.z, row.id]
+        );
+      }
+      return res.sendStatus(200);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
 
 module.exports = router;

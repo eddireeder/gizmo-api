@@ -12,7 +12,12 @@ generateDirection = async () => {
     // Check that direction is not too close to existing directions
     let valid = true;
     for (let soundDirection of soundDirections) {
-      if (calculateDegreesFrom(soundDirection, randomDirection) < 30) {
+      if (
+        soundDirection.direction_x != null &&
+        soundDirection.direction_y != null &&
+        soundDirection.direction_z != null &&
+        calculateDegreesFrom(soundDirection, randomDirection) < 30
+      ) {
         valid = false;
         break;
       }
