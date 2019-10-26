@@ -13,7 +13,8 @@ router.get("/", async (req, res, next) => {
           ? {
               primaryAngle: rows[0].primary_angle,
               secondaryAngle: rows[0].secondary_angle,
-              timeToFocus: rows[0].time_to_focus
+              timeToFocus: rows[0].time_to_focus,
+              minAngleBetweenSounds: rows[0].min_angle_between_sounds
             }
           : null
     });
@@ -28,7 +29,8 @@ router.post("/", isAuthenticated, async (req, res, next) => {
     !(
       req.body.primaryAngle != null &&
       req.body.secondaryAngle != null &&
-      req.body.timeToFocus != null
+      req.body.timeToFocus != null &&
+      req.body.minAngleBetweenSounds != null
     )
   ) {
     return res.status(400).json({ message: "Invalid parameters" });
@@ -39,11 +41,16 @@ router.post("/", isAuthenticated, async (req, res, next) => {
     await db.query(
       `
       INSERT INTO configurations
-      (primary_angle, secondary_angle, time_to_focus)
+      (primary_angle, secondary_angle, time_to_focus, min_angle_between_sounds)
       VALUES
-      ($1, $2, $3)
+      ($1, $2, $3, $4)
     `,
-      [req.body.primaryAngle, req.body.secondaryAngle, req.body.timeToFocus]
+      [
+        req.body.primaryAngle,
+        req.body.secondaryAngle,
+        req.body.timeToFocus,
+        req.body.minAngleBetweenSounds
+      ]
     );
     return res.sendStatus(200);
   } catch (e) {
