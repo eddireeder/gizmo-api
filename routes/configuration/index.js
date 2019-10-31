@@ -49,7 +49,7 @@ router.post("/", isAuthenticated, async (req, res, next) => {
       INSERT INTO configurations
       (primary_angle, secondary_angle, time_to_focus, min_angle_between_sounds, max_media_players, max_idle_sensor_difference, max_idle_seconds)
       VALUES
-      ($1, $2, $3, $4)
+      ($1, $2, $3, $4, $5, $6, $7)
     `,
       [
         req.body.primaryAngle,
