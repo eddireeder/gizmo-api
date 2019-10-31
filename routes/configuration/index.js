@@ -14,7 +14,10 @@ router.get("/", async (req, res, next) => {
               primaryAngle: rows[0].primary_angle,
               secondaryAngle: rows[0].secondary_angle,
               timeToFocus: rows[0].time_to_focus,
-              minAngleBetweenSounds: rows[0].min_angle_between_sounds
+              minAngleBetweenSounds: rows[0].min_angle_between_sounds,
+              maxMediaPlayers: rows[0].max_media_players,
+              maxIdleSensorDifference: rows[0].max_idle_sensor_difference,
+              maxIdleSeconds: rows[0].max_idle_seconds
             }
           : null
     });
@@ -30,7 +33,10 @@ router.post("/", isAuthenticated, async (req, res, next) => {
       req.body.primaryAngle != null &&
       req.body.secondaryAngle != null &&
       req.body.timeToFocus != null &&
-      req.body.minAngleBetweenSounds != null
+      req.body.minAngleBetweenSounds != null &&
+      req.body.maxMediaPlayers != null &&
+      req.body.maxIdleSensorDifference != null &&
+      req.body.maxIdleSeconds != null
     )
   ) {
     return res.status(400).json({ message: "Invalid parameters" });
@@ -41,7 +47,7 @@ router.post("/", isAuthenticated, async (req, res, next) => {
     await db.query(
       `
       INSERT INTO configurations
-      (primary_angle, secondary_angle, time_to_focus, min_angle_between_sounds)
+      (primary_angle, secondary_angle, time_to_focus, min_angle_between_sounds, max_media_players, max_idle_sensor_difference, max_idle_seconds)
       VALUES
       ($1, $2, $3, $4)
     `,
@@ -49,7 +55,10 @@ router.post("/", isAuthenticated, async (req, res, next) => {
         req.body.primaryAngle,
         req.body.secondaryAngle,
         req.body.timeToFocus,
-        req.body.minAngleBetweenSounds
+        req.body.minAngleBetweenSounds,
+        req.body.maxMediaPlayers,
+        req.body.maxIdleSensorDifference,
+        req.body.maxIdleSeconds
       ]
     );
     return res.sendStatus(200);
