@@ -86,8 +86,7 @@ router.post("/", isAuthenticated, async (req, res, next) => {
         req.body.category,
         req.body.cdNumber,
         req.body.cdName,
-        req.body.trackNumber,
-        false
+        req.body.trackNumber
       ]
     );
     return res.sendStatus(200);
