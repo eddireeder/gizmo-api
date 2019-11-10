@@ -20,7 +20,35 @@ router.get("/", async (req, res, next) => {
           category: sound.category,
           cdNumber: sound.cd_number,
           cdName: sound.cd_name,
-          trackNumber: sound.track_number
+          trackNumber: sound.track_number,
+          selected: sound.selected,
+          onPhone: true
+        };
+      })
+    });
+  } catch (e) {
+    return next(e);
+  }
+});
+
+router.get("/selected", async (req, res, next) => {
+  try {
+    const { rows } = await db.query("SELECT * FROM sounds WHERE selected=True");
+    return res.json({
+      sounds: rows.map(sound => {
+        return {
+          id: sound.id,
+          directionX: sound.direction_x,
+          directionY: sound.direction_y,
+          directionZ: sound.direction_z,
+          location: sound.location,
+          description: sound.description,
+          category: sound.category,
+          cdNumber: sound.cd_number,
+          cdName: sound.cd_name,
+          trackNumber: sound.track_number,
+          selected: sound.selected,
+          onPhone: true
         };
       })
     });
@@ -44,26 +72,22 @@ router.post("/", isAuthenticated, async (req, res, next) => {
     return res.status(400).json({ message: "Invalid parameters" });
   }
   try {
-    // Generate direction for the sound
-    const direction = await generateDirection();
     // Attempt to insert
     const { rows } = await db.query(
       `
       INSERT INTO sounds
-      (direction_x, direction_y, direction_z, location, description, category, cd_number, cd_name, track_number)
+      (direction_x, direction_y, direction_z, location, description, category, cd_number, cd_name, track_number, selected)
       VALUES
-      ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      (null, null, null, $1, $2, $3, $4, $5, $6, False)
     `,
       [
-        direction.x,
-        direction.y,
-        direction.z,
         req.body.location,
         req.body.description,
         req.body.category,
         req.body.cdNumber,
         req.body.cdName,
-        req.body.trackNumber
+        req.body.trackNumber,
+        false
       ]
     );
     return res.sendStatus(200);
@@ -88,18 +112,70 @@ router.delete("/:id", isAuthenticated, async (req, res, next) => {
   }
 });
 
+router.post("/:id/select", isAuthenticated, async (req, res, next) => {
+  // Verify input
+  if (!req.params.id) {
+    return res.status(400).json({ message: "Invalid parameters" });
+  }
+  try {
+    // Generate direction for the sound
+    const direction = await generateDirection();
+    // Attempt to update
+    const { rows } = await db.query(
+      `
+      UPDATE sounds 
+      SET (selected, direction_x, direction_y, direction_z) = (True, $1, $2, $3)
+      WHERE id=$4
+    `,
+      [direction.x, direction.y, direction.z, req.params.id]
+    );
+    return res.sendStatus(200);
+  } catch (e) {
+    return next(e);
+  }
+});
+
+router.post("/:id/deselect", isAuthenticated, async (req, res, next) => {
+  // Verify input
+  if (!req.params.id) {
+    return res.status(400).json({ message: "Invalid parameters" });
+  }
+  try {
+    // Attempt to update
+    const { rows } = await db.query(
+      `
+      UPDATE sounds 
+      SET (selected, direction_x, direction_y, direction_z) = (False, null, null, null)
+      WHERE id=$1
+    `,
+      [req.params.id]
+    );
+    return res.sendStatus(200);
+  } catch (e) {
+    return next(e);
+  }
+});
+
 router.post(
   "/regenerateDirections",
   isAuthenticated,
   async (req, res, next) => {
     try {
       // Remove direction from all sounds
-      await db.query(`
+      await db.query(
+        `
         UPDATE sounds
         SET (direction_x, direction_y, direction_z) = (null, null, null)
-      `);
-      // Retrieve all sounds
-      const { rows } = await db.query("SELECT * FROM sounds");
+      `
+      );
+      // Retrieve all selected sounds
+      const { rows } = await db.query(
+        `
+        SELECT *
+        FROM sounds
+        WHERE selected=True
+      `
+      );
       // Generate a new direction for each sound and update it
       for (row of rows) {
         const direction = await generateDirection();
