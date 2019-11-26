@@ -1,6 +1,6 @@
 FROM node:11
 
-WORKDIR /opt/gizmo-api
+WORKDIR /opt/the-sonosynthesiser-api
 
 COPY package*.json ./
 

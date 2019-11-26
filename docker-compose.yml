@@ -1,9 +1,9 @@
 version: "3"
 
 services:
-  gizmo-postgres:
+  the-sonosynthesiser-postgres:
     image: postgres
-    container_name: gizmo-postgres
+    container_name: the-sonosynthesiser-postgres
     restart: always
     ports:
       - "5432:5432"
@@ -13,16 +13,16 @@ services:
       options:
         max-size: "50m"
 
-  gizmo-api:
+  the-sonosynthesiser-api:
     build: ./
-    container_name: gizmo-api
+    container_name: the-sonosynthesiser-api
     depends_on:
-      - gizmo-postgres
+      - the-sonosynthesiser-postgres
     restart: always
     ports:
       - "3000:3000"
     environment:
-      - POSTGRES_HOST=gizmo-postgres
+      - POSTGRES_HOST=the-sonosynthesiser-postgres
     logging:
       options:
         max-size: "50m"
