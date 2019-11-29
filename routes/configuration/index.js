@@ -17,7 +17,9 @@ router.get("/", async (req, res, next) => {
               minAngleBetweenSounds: rows[0].min_angle_between_sounds,
               maxMediaPlayers: rows[0].max_media_players,
               maxIdleSensorDifference: rows[0].max_idle_sensor_difference,
-              maxIdleSeconds: rows[0].max_idle_seconds
+              maxIdleSeconds: rows[0].max_idle_seconds,
+              selectRandomly: rows[0].select_randomly,
+              numRandomlySelected: rows[0].num_randomly_selected
             }
           : null
     });
@@ -36,7 +38,9 @@ router.post("/", isAuthenticated, async (req, res, next) => {
       req.body.minAngleBetweenSounds != null &&
       req.body.maxMediaPlayers != null &&
       req.body.maxIdleSensorDifference != null &&
-      req.body.maxIdleSeconds != null
+      req.body.maxIdleSeconds != null &&
+      req.body.selectRandomly != null &&
+      req.body.numRandomlySelected != null
     )
   ) {
     return res.status(400).json({ message: "Invalid parameters" });
@@ -47,9 +51,9 @@ router.post("/", isAuthenticated, async (req, res, next) => {
     await db.query(
       `
       INSERT INTO configurations
-      (primary_angle, secondary_angle, time_to_focus, min_angle_between_sounds, max_media_players, max_idle_sensor_difference, max_idle_seconds)
+      (primary_angle, secondary_angle, time_to_focus, min_angle_between_sounds, max_media_players, max_idle_sensor_difference, max_idle_seconds, select_randomly, num_randomly_selected)
       VALUES
-      ($1, $2, $3, $4, $5, $6, $7)
+      ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `,
       [
         req.body.primaryAngle,
@@ -58,7 +62,9 @@ router.post("/", isAuthenticated, async (req, res, next) => {
         req.body.minAngleBetweenSounds,
         req.body.maxMediaPlayers,
         req.body.maxIdleSensorDifference,
-        req.body.maxIdleSeconds
+        req.body.maxIdleSeconds,
+        req.body.selectRandomly,
+        req.body.numRandomlySelected
       ]
     );
     return res.sendStatus(200);
